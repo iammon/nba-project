@@ -47,8 +47,8 @@ docker compose ps
 |-----|-------|
 | **System** | PostgreSQL |
 | **Server** | db |
-| **User** | htaw |
-| **Password** | meownedu2 |
+| **User** | postgres
+| **Password** | postgres |
 | **Database** | nba |
 
 ---

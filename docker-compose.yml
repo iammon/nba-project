@@ -4,8 +4,8 @@ services:
     container_name: pg
     restart: unless-stopped
     environment:
-      POSTGRES_USER: htaw
-      POSTGRES_PASSWORD: meownedu2
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: nba
     ports:
       - "5433:5432" # host:container; keep 5433 to avoid conflicts on classmates' machines
