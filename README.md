@@ -119,13 +119,13 @@ curl -s http://localhost:3000/api/players | jq
 
 **Htaw Mon**  
 _Computer Science, The University of Akron
-[GitHub @iammon](https://github.com/iammon)
+[GitHub @iammon](https://github.com/iammon) 
 
-**Evan Castner**
-_Computer Science, The University of Akron
+**Evan Castner**  
+_Computer Science, The University of Akron 
 
-**Sabrina**
-_Computer Science, The University of Akron
+**Sabrina**  
+_Computer Science, The University of Akron 
 
 ---
 
