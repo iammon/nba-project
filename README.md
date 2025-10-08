@@ -118,8 +118,14 @@ curl -s http://localhost:3000/api/players | jq
 ## 🧑‍💻 Author
 
 **Htaw Mon**  
-_Master of Architecture, The Ohio State University_  
+_Computer Science, The University of Akron
 [GitHub @iammon](https://github.com/iammon)
+
+**Evan Castner**
+_Computer Science, The University of Akron
+
+**Sabrina**
+_Computer Science, The University of Akron
 
 ---
 
