@@ -71,7 +71,7 @@ This project includes a pre-loaded dataset (`data/nba_snapshot.dump`) containing
 If needed, you can manually restore the database:
 
 ```bash
-pg_restore -h localhost -p 5433 -U htaw -d nba \
+pg_restore -h localhost -p 5433 -U postgres \
   --no-owner --no-privileges data/nba_snapshot.dump
 ```
 
