@@ -2,44 +2,45 @@ services:
   db:
     image: postgres:16
     container_name: pg
-    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: nba
     ports:
-      - "5433:5432" # host:container; keep 5433 to avoid conflicts on classmates' machines
+      - "5433:5432"
     volumes:
       - dbdata:/var/lib/postgresql/data
+      # provide dump + init script; these run only on *first* init of an empty volume
+      - ./data/nba_snapshot.dump:/docker-entrypoint-initdb.d/nba_snapshot.dump:ro
+      - ./docker/init/01-restore.sh:/docker-entrypoint-initdb.d/01-restore.sh:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U htaw -d nba"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d nba"]
       interval: 5s
       timeout: 3s
       retries: 10
 
-  web:
+  nba-adminer:
+    image: adminer
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+  nba-web:
     build: .
-    container_name: nba-web
     depends_on:
       db:
         condition: service_healthy
     environment:
-      # IMPORTANT: inside Docker network, connect using the **service name** and port 5432
-      DATABASE_URL: "postgresql://htaw:meownedu2@db:5432/nba?schema=public"
-      NODE_ENV: "production"
+      # Your app reads DATABASE_URL at runtime
+      DATABASE_URL: "postgresql://postgres:postgres@db:5432/nba?schema=public"
     ports:
-      - "3000:3000" # app available at http://localhost:3000
-
-  adminer:
-    image: adminer
-    container_name: nba-adminer
-    restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
-    ports:
-      - "8080:8080" # http://localhost:8080
+      - "3000:3000"
+    command: ["npm", "run", "start"]  # or "dev" if you prefer dev mode
+    # ^ If you use `next dev`, it’ll hot-reload. For production, keep `next start`.
 
 volumes:
   dbdata:
+
 
