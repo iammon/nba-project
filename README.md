@@ -1,3 +1,28 @@
+git clone <your-repo>
+cd nba-project
+
+# One command to build + start everything
+docker compose up -d --build
+
+# Wait for 'db' to be healthy, then open:
+# App:     http://localhost:3000
+# Adminer: http://localhost:8080
+#   System: PostgreSQL
+#   Server: db
+#   User:   htaw
+#   Pass:   meownedu2
+#   DB:     nba
+
+# To view logs:
+docker compose logs -f web
+docker compose logs -f db
+
+# To stop everything:
+docker compose down
+
+
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

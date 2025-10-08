@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model boxscores {
+  game_id     BigInt
+  player_id   Int
+  team_id     Int?
+  minutes_raw String?
+  minutes_s   Int?
+  fgm         Int?
+  fga         Int?
+  fg_pct      Decimal? @db.Decimal
+  fg3m        Int?
+  fg3a        Int?
+  fg3_pct     Decimal? @db.Decimal
+  ftm         Int?
+  fta         Int?
+  ft_pct      Decimal? @db.Decimal
+  oreb        Int?
+  dreb        Int?
+  reb         Int?
+  ast         Int?
+  stl         Int?
+  blk         Int?
+  tov         Int?
+  pf          Int?
+  pts         Int?
+  plus_minus  Int?
+  games       games    @relation(fields: [game_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  players     players  @relation(fields: [player_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  teams       teams?   @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([game_id, player_id])
+  @@index([game_id], map: "idx_box_game")
+  @@index([player_id], map: "idx_box_player")
+  @@index([team_id], map: "idx_box_team")
+}
+
+model games {
+  id                                 BigInt      @id
+  season                             Int
+  game_date                          DateTime    @db.Date
+  home_team_id                       Int?
+  visitor_team_id                    Int?
+  home_points                        Int?
+  visitor_points                     Int?
+  home_team_wins                     Boolean?
+  boxscores                          boxscores[]
+  teams_games_home_team_idToteams    teams?      @relation("games_home_team_idToteams", fields: [home_team_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  teams_games_visitor_team_idToteams teams?      @relation("games_visitor_team_idToteams", fields: [visitor_team_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([game_date], map: "idx_games_date")
+}
+
+model players {
+  id        Int         @id
+  name      String
+  boxscores boxscores[]
+}
+
+model teams {
+  id                                 Int         @id
+  abbreviation                       String?
+  nickname                           String?
+  city                               String?
+  min_year                           Int?
+  max_year                           Int?
+  boxscores                          boxscores[]
+  games_games_home_team_idToteams    games[]     @relation("games_home_team_idToteams")
+  games_games_visitor_team_idToteams games[]     @relation("games_visitor_team_idToteams")
+}
