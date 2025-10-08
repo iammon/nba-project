@@ -115,17 +115,17 @@ curl -s http://localhost:3000/api/players | jq
 
 ---
 
-## 🧑‍💻 Author
+## 🧑‍💻 Authors  
 
 **Htaw Mon**  
-_Computer Science, The University of Akron
+_Computer Science, The University of Akron_  
 [GitHub @iammon](https://github.com/iammon)  
 
 **Evan Castner**  
-_Computer Science, The University of Akron  
+_Computer Science, The University of Akron_  
 
 **Sabrina**  
-_Computer Science, The University of Akron  
+_Computer Science, The University of Akron_  
 
 ---
 
