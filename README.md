@@ -14,7 +14,7 @@ Built to demonstrate database querying and API interaction between a modern web 
 ## 🚀 Quick Start
 
 ### 1️⃣ Clone the Repository
-
+This step is unneeded if running on GitHub Codespaces.
 ```bash
 git clone https://github.com/iammon/nba-project.git
 cd nba-project
@@ -31,6 +31,26 @@ Wait until both containers (`db` and `adminer`) show **"healthy"**:
 ```bash
 docker compose ps
 ```
+Confirm the DB auto-restore ran:
+
+```bash
+docker compose logs -f db | sed -n '1,200p'
+```
+
+Look for:
+```bash
+/docker-entrypoint-initdb.d/01-restore.sh
+🔄 Restoring ...nba_snapshot.dump...
+✅ Initial restore complete.
+```
+
+If restore worked, we can do an API smoke test from terminal:
+```bash
+curl -s http://localhost:3000/api/health | jq
+curl -s http://localhost:3000/api/players | jq
+
+```
+You should see something like { ok: true, ... } and a non-empty players array.
 
 ---
 
