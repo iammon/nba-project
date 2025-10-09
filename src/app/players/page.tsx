@@ -9,20 +9,21 @@ type SearchParams = { q?: string };
 export default async function PlayersPage({
   searchParams,
 }: {
-  // 👇 Next 15: searchParams is async
   searchParams: Promise<SearchParams>;
 }) {
-  const sp = await searchParams;           // ✅ await it
+  const sp = await searchParams;
   const q = (sp.q ?? "").trim() || null;
 
-  const players = await prisma.$queryRaw<{ id: number; name: string }[]>`
-    SELECT id, name
-    FROM players
-    WHERE ${q}::text IS NULL
-       OR name ILIKE '%' || ${q} || '%'
-    ORDER BY id ASC
-    LIMIT 100
-  `;
+  const players =
+    q
+      ? await prisma.$queryRaw<{ id: number; name: string }[]>`
+          SELECT id, name
+          FROM players
+          WHERE name ILIKE '%' || ${q} || '%'
+          ORDER BY id ASC
+          LIMIT 100
+        `
+      : []; // 👈 no query => show nothing
 
   return (
     <main className="mx-auto max-w-3xl p-6 space-y-6">
@@ -68,5 +69,3 @@ export default async function PlayersPage({
     </main>
   );
 }
-
-
