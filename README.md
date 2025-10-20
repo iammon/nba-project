@@ -153,7 +153,6 @@ _Computer Science, The University of Akron_
 
 **Evan Castner**  
 _Computer Science, The University of Akron_
-This is a test
 
 **Sabrina**  
 _Computer Science, The University of Akron_  
