@@ -26,6 +26,11 @@ cd nba-project
 docker compose up -d --build
 ```
 
+If pages won't load, remove orphans:
+```bash
+docker compose down -v --remove-orphans
+```
+
 Wait until both containers (`db` and `adminer`) show **"healthy"**:
 
 ```bash
