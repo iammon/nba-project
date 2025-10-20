@@ -31,6 +31,11 @@ If pages won't load, remove orphans:
 docker compose down -v --remove-orphans
 ```
 
+Access the database:
+```bash
+psql -h localhost -p 5433 -U htaw -d nba
+```
+
 Wait until both containers (`db` and `adminer`) show **"healthy"**:
 
 ```bash
