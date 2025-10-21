@@ -33,7 +33,8 @@ docker compose down -v --remove-orphans
 
 Access the database:
 ```bash
-psql -h localhost -p 5433 -U htaw -d nba
+psql -h localhost -p 5433 -U postgres -d nba
+password: postgres
 ```
 
 Wait until both containers (`db` and `adminer`) show **"healthy"**:
