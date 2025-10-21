@@ -28,7 +28,8 @@ docker compose up -d --build
 
 If pages won't load, remove orphans:
 ```bash
-docker compose down -v --remove-orphans
+docker compose down
+docker compose up -d
 ```
 
 Access the database:
