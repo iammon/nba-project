@@ -157,7 +157,7 @@ _Computer Science, The University of Akron_
 _Computer Science, The University of Akron_
 
 **Sabrina**  
-_Computer Science, The University of Akron_  
+_Computer Science and Applied Mathematics, The University of Akron_  
 
 ---
 
