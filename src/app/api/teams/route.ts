@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
     const teams = await prisma.$queryRawUnsafe<{
         id: number;
+        nickname: string | null;
         abbreviation: string | null;
         city: string | null;
         min_year: number | null;
