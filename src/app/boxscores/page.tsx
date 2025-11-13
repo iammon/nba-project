@@ -5,7 +5,7 @@ import Link from "next/link";
 
 type SearchParams = {
     game_id?: string;
-    plaer_id?: string;
+    player_id?: string;
 };
 
 export default async function BoxscorePage({
@@ -15,7 +15,7 @@ export default async function BoxscorePage({
 }) {
     const sp = await searchParams;
     const gameId = sp.game_id?.trim() || null;
-    const playerId = sp.plaer_id?.trim() || null;
+    const playerId = sp.player_id?.trim() || null;
 
     const boxscores = 
         gameId || playerId
