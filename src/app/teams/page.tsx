@@ -29,7 +29,7 @@ export default async function PlayersPage({
           WHERE city ILIKE '%' || ${q} || '%'
             OR nickname ILIKE '%' || ${q} || '%'
             OR abbreviation ILIKE '%' || ${q} || '%'
-          ORDER BY city ASC, nikcname ASC
+          ORDER BY city ASC, nickname ASC
           LIMIT 100
         `
       : []; // 👈 no query => show nothing
