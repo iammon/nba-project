@@ -23,9 +23,9 @@ export default function Home() {
         <a
           href="/bocscores"
           className="inline-block rounded-x1 px-4 py-2 bg-black text-white hover:bg-gray-9=800"
-          >
-            View Boxscores
-         </a>
+        >
+          View Boxscores
+        </a>
       </div>
     </main>
   );
