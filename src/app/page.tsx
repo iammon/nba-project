@@ -21,10 +21,16 @@ export default function Home() {
           View Teams
         </a>
         <a
-          href="/bocscores"
+          href="/boxscores"
           className="inline-block rounded-x1 px-4 py-2 bg-black text-white hover:bg-gray-9=800"
         >
           View Boxscores
+        </a>
+        <a
+          href="/games"
+          className="inline-block rounded-x1 px-4 py-2 bg-black text-white hover:bg-gray-9=800"
+        >
+          View Games
         </a>
       </div>
     </main>
