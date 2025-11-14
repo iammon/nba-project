@@ -66,7 +66,7 @@ export default async function BoxscorePage({
         <Link href="/" className="text-sm text-blue-600 hover:underline">Home</Link>
       </header>
 
-      <form className="flex flex-col sm:flex-row items-start sm:items-center gap-2" action="/boxscore" method="get">
+      <form className="flex flex-col sm:flex-row items-start sm:items-center gap-2" action="/boxscores" method="get">
         <input
           type="text"
           name="game_id"
