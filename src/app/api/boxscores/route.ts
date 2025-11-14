@@ -20,7 +20,7 @@ export async function GET() {
         blk: number | null;
         tov: number | null;
     }[]>(`
-        SELECT game_id, player_id, team_id, pts, ast, reb, fgm, fg3m, fg3a, ftm, fta, stl, blk, tov
+        SELECT game_id, player_id, team_id, pts, ast, reb, fgm, fga, fg3m, fg3a, ftm, fta, stl, blk, tov
         FROM boxscores
         ORDER BY game_id DESC
         LIMIT 100
