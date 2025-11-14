@@ -15,17 +15,17 @@ export default async function BoxscorePage({
   searchParams: Promise<SearchParams>;
 }) {
   const sp = await searchParams;
-  const gameId = (sp.game_id ?).trim() || null;
-  const playerId = (sp.player_id ?).trim() || null;
+  const gameId = (sp.game_id ?? "").trim() || null;
+  const playerId = (sp.player_id ?? "").trim() || null;
 
   const boxscores = 
       gameId || playerId
       ? await prisma.$queryRaw<{
-          game_id: BigInt;
+          game_id: bigint;
           player_id: number;
           player_name: string;
           team_id: number | null;
-          team_name: number | null;
+          team_name: string | null;
           pts: number | null;
           ast: number | null;
           reb: number | null;
@@ -59,7 +59,8 @@ export default async function BoxscorePage({
           ORDER BY b.game_id DESC, b.pts DESC
           LIMIT 100
       `
-    : [];
+    : [];  // No query => show nothing
+
   return (
     <main className="mx-auto max-w-6xl p-6 space-y-6">
       <header className="flex items-center justify-between gap-4">
