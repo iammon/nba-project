@@ -1,6 +1,7 @@
 // src/app/boxscores/page.tsx
 export const dynamic = "force-dynamic";
-import { prisma } from "@/lib/prisma"
+
+import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
 type SearchParams = {
@@ -9,57 +10,57 @@ type SearchParams = {
 };
 
 export default async function BoxscorePage({
-    searchParams,
+  searchParams,
 }: {
-    searchParams: Promise<SearchParams>;
+  searchParams: Promise<SearchParams>;
 }) {
-    const sp = await searchParams;
-    const gameId = sp.game_id?.trim() || null;
-    const playerId = sp.player_id?.trim() || null;
+  const sp = await searchParams;
+  const gameId = (sp.game_id ?).trim() || null;
+  const playerId = (sp.player_id ?).trim() || null;
 
-    const boxscores = 
-        gameId || playerId
-        ? await prisma.$queryRaw<{
-            game_id: BigInt;
-            player_id: number;
-            player_name: string;
-            team_id: number | null;
-            team_name: number | null;
-            pts: number | null;
-            ast: number | null;
-            reb: number | null;
-            fgm: number | null;
-            fga: number | null;
-            fg3m: number | null;
-            fg3a: number | null;
-            ftm: number | null;
-            fta: number | null;
-            stl: number | null;
-            blk: number | null;
-            tov: number | null;
-        }[]>`
-            SELECT 
-                b.game_id, 
-                b.player_id,
-                p.name as player_name,
-                b.team_id,
-                t.full_name as team_name,
-                b.pts, b.ast, b.reb,
-                b.fgm, b.fga,
-                b.fg3m, b.fg3a,
-                b.ftm, b.fta,
-                b.stl, b.blk, b.tov
-            FROM boxscores b
-            LEFT JOIN players p ON b.player_id = p.id
-            LEFT JOIN teams t ON b.team_id = t.id
-            WHERE 
-                ${gameId ? `b.game_id = ${gameId}` : '1=1'}
-                ${playerId ? `AND b.player_id = ${playerId}` : ''}
-            ORDER BY b.game_id DESC, b.pts DESC
-            LIMIT 100
-        `
-        : [];
-    return (
+  const boxscores = 
+      gameId || playerId
+      ? await prisma.$queryRaw<{
+          game_id: BigInt;
+          player_id: number;
+          player_name: string;
+          team_id: number | null;
+          team_name: number | null;
+          pts: number | null;
+          ast: number | null;
+          reb: number | null;
+          fgm: number | null;
+          fga: number | null;
+          fg3m: number | null;
+          fg3a: number | null;
+          ftm: number | null;
+          fta: number | null;
+          stl: number | null;
+          blk: number | null;
+          tov: number | null;
+      }[]>`
+        SELECT 
+          b.game_id, 
+          b.player_id,
+          p.name as player_name,
+          b.team_id,
+          t.full_name as team_name,
+          b.pts, b.ast, b.reb,
+          b.fgm, b.fga,
+          b.fg3m, b.fg3a,
+          b.ftm, b.fta,
+          b.stl, b.blk, b.tov
+        FROM boxscores b
+        LEFT JOIN players p ON b.player_id = p.id
+        LEFT JOIN teams t ON b.team_id = t.id
+        WHERE 
+          ${gameId ? `b.game_id = ${gameId}` : '1=1'}
+          ${playerId ? `AND b.player_id = ${playerId}` : ''}
+          ORDER BY b.game_id DESC, b.pts DESC
+          LIMIT 100
+      `
+    : [];
+  return (
     <main className="mx-auto max-w-6xl p-6 space-y-6">
       <header className="flex items-center justify-between gap-4">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Boxscores</h1>
