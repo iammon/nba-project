@@ -24,6 +24,9 @@ export default async function BoxscorePage({
           player_name: string;
           team_id: number | null;
           team_name: string | null;
+          team_abbr: string | null;
+          season: number | null;
+          game_date: Date;
           pts: number | null;
           ast: number | null;
           reb: number | null;
