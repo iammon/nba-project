@@ -31,29 +31,29 @@ export default async function GamesPage({
             visitor_abbr: string | null;
           }[]>`
             SELECT 
-                g.id,
-                g.season,
-                g.game_date,
-                g.home_points,
-                g.visitor_points,
-                g.home_team_wins,
-                ht.city as home_city,
-                ht.nickname as home_nickname,
-                ht.abbreviation as home_abbr,
-                vt.city as visitor_city,
-                vt.nickname as visitor_nickname,
-                vt.abbreviation as visitor_abbr
-                FROM games g
+              g.id,
+              g.season,
+              g.game_date,
+              g.home_points,
+              g.visitor_points,
+              g.home_team_wins,
+              ht.city as home_city,
+              ht.nickname as home_nickname,
+              ht.abbreviation as home_abbr,
+              vt.city as visitor_city,
+              vt.nickname as visitor_nickname,
+              vt.abbreviation as visitor_abbr
+            FROM games g
             LEFT JOIN teams ht ON g.home_team_id = ht.id
             LEFT JOIN teams vt ON g.visitor_team_id = vt.id
             WHERE 
-                ht.city ILIKE '%' || ${q} || '%'
-                OR ht.nickname ILIKE '%' || ${q} || '%'
-                OR ht.abbreviation ILIKE '%' || ${q} || '%'
-                OR vt.city ILIKE '%' || ${q} || '%'
-                OR vt.nickname ILIKE '%' || ${q} || '%'
-                OR vt.abbreviation ILIKE '%' || ${q} || '%'
-                OR CAST(g.season AS TEXT) ILIKE '%' || ${q} || '%'
+              ht.city ILIKE ${`%${q}%`}
+              OR ht.nickname ILIKE ${`%${q}%`}
+              OR ht.abbreviation ILIKE ${`%${q}%`}
+              OR vt.city ILIKE ${`%${q}%`}
+              OR vt.nickname ILIKE ${`%${q}%`}
+              OR vt.abbreviation ILIKE ${`%${q}%`}
+              OR CAST(g.season AS TEXT) ILIKE ${`%${q}%`}
             ORDER BY g.game_date DESC, g.id DESC
             LIMIT 100
           `
