@@ -11,9 +11,9 @@ type SearchParams = {
 export default async function BoxscorePage({
   searchParams,
 }: {
-  searchParams: Promise<SearchParams>;
+  searchParams: SearchParams;
 }) {
-  const sp = await searchParams;
+  const sp = searchParams;
   const q = (sp.q ?? "").trim() || null;
 
   const boxscores = 

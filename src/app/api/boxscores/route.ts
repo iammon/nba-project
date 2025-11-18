@@ -1,5 +1,4 @@
 // src/app/api/boxscore
-
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ChildProcessWithoutNullStreams } from "child_process";
