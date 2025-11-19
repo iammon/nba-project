@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import BoxscoreExpand from "./BoxscoreExpand";
 
 type SearchParams = { q?: string };
 
@@ -159,6 +160,7 @@ export default async function GamesPage({
 
                 <div className="text-xs text-gray-400 text-center">
                   Game ID: {g.id.toString()}
+                  <BoxscoreExpand gameId={g.id.toString()} />
                 </div>
               </div>
             </li>
