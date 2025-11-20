@@ -76,3 +76,20 @@ model teams {
   games_games_home_team_idToteams    games[]     @relation("games_home_team_idToteams")
   games_games_visitor_team_idToteams games[]     @relation("games_visitor_team_idToteams")
 }
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  name      String?
+  favorites Favorite[]
+}
+
+model Favorite {
+  id       Int    @id @default(autoincrement())
+  user     User   @relation(fields: [userId], references: [id])
+  userId   Int
+  type     String // "player" or "team"
+  itemId   Int    // ID of the player or team
+  createdAt DateTime @default(now())
+}
