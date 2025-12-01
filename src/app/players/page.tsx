@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import PlayerChart from "@/components/PlayerChart";
 
 type SearchParams = {
   q?: string;
@@ -39,7 +40,7 @@ export default async function PlayersPage({
       ? Number(sp.playerId)
       : null;
 
-  // 1) Search players by name (same as before)
+  // 1) Search players by name
   const players =
     q
       ? await prisma.$queryRaw<{ id: number; name: string }[]>`
@@ -77,44 +78,44 @@ export default async function PlayersPage({
     // only fetch stats if we found a player
     if (selectedPlayerName) {
       seasonStats = await prisma.$queryRaw<SeasonStat[]>`
-  SELECT
-    g.season::int                         AS season,
-    COUNT(*)::int                         AS games_played,
-    SUM(b.pts)::float                     AS total_pts,
-    AVG(b.pts)::float                     AS avg_pts,
-    SUM(b.reb)::float                     AS total_reb,
-    AVG(b.reb)::float                     AS avg_reb,
-    SUM(b.ast)::float                     AS total_ast,
-    AVG(b.ast)::float                     AS avg_ast,
-    CASE
-      WHEN SUM(b.fga) > 0
-      THEN (SUM(b.fgm)::float / SUM(b.fga)::float)
-      ELSE NULL
-    END                                   AS fg_pct,
-    CASE
-      WHEN SUM(b.fg3a) > 0
-      THEN (SUM(b.fg3m)::float / SUM(b.fg3a)::float)
-      ELSE NULL
-    END                                   AS fg3_pct,
-    CASE
-      WHEN SUM(b.fta) > 0
-      THEN (SUM(b.ftm)::float / SUM(b.fta)::float)
-      ELSE NULL
-    END                                   AS ft_pct,
-    SUM(b.minutes_s)::float               AS total_minutes_s,
-    CASE
-      WHEN COUNT(*) > 0 AND SUM(b.minutes_s) IS NOT NULL
-      THEN (SUM(b.minutes_s)::float / COUNT(*)::float / 60.0)
-      ELSE NULL
-    END                                   AS mpg
-  FROM boxscores b
-  JOIN games g ON g.id = b.game_id
-  JOIN game_types t ON t.game_id = g.id
-  WHERE b.player_id = ${selectedPlayerId}
-    AND t.game_type = 'Regular'
-  GROUP BY g.season
-  ORDER BY g.season ASC
-`;
+        SELECT
+          g.season::int                         AS season,
+          COUNT(*)::int                         AS games_played,
+          SUM(b.pts)::float                     AS total_pts,
+          AVG(b.pts)::float                     AS avg_pts,
+          SUM(b.reb)::float                     AS total_reb,
+          AVG(b.reb)::float                     AS avg_reb,
+          SUM(b.ast)::float                     AS total_ast,
+          AVG(b.ast)::float                     AS avg_ast,
+          CASE
+            WHEN SUM(b.fga) > 0
+            THEN (SUM(b.fgm)::float / SUM(b.fga)::float)
+            ELSE NULL
+          END                                   AS fg_pct,
+          CASE
+            WHEN SUM(b.fg3a) > 0
+            THEN (SUM(b.fg3m)::float / SUM(b.fg3a)::float)
+            ELSE NULL
+          END                                   AS fg3_pct,
+          CASE
+            WHEN SUM(b.fta) > 0
+            THEN (SUM(b.ftm)::float / SUM(b.fta)::float)
+            ELSE NULL
+          END                                   AS ft_pct,
+          SUM(b.minutes_s)::float               AS total_minutes_s,
+          CASE
+            WHEN COUNT(*) > 0 AND SUM(b.minutes_s) IS NOT NULL
+            THEN (SUM(b.minutes_s)::float / COUNT(*)::float / 60.0)
+            ELSE NULL
+          END                                   AS mpg
+        FROM boxscores b
+        JOIN games g ON g.id = b.game_id
+        JOIN game_types t ON t.game_id = g.id
+        WHERE b.player_id = ${selectedPlayerId}
+          AND t.game_type = 'Regular'
+        GROUP BY g.season
+        ORDER BY g.season ASC
+      `;
     }
   }
 
@@ -201,9 +202,9 @@ export default async function PlayersPage({
         )}
       </ul>
 
-      {/* Season-by-season stats when a player is selected */}
+      {/* Season-by-season stats + chart when a player is selected */}
       {selectedPlayerName && seasonStats.length > 0 && (
-        <section className="space-y-3">
+        <section className="space-y-4">
           <h2 className="text-xl font-semibold">
             Season stats for{" "}
             <span className="font-bold">{selectedPlayerName}</span>
@@ -264,6 +265,9 @@ export default async function PlayersPage({
               </tbody>
             </table>
           </div>
+
+          {/* Trend graph */}
+          <PlayerChart stats={seasonStats} />
         </section>
       )}
     </main>
