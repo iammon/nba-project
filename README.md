@@ -23,13 +23,17 @@ cd nba-project
 ### 2️⃣ Start Everything with Docker
 
 SQL Commands in case User and user_fav tables don't exist
+
+For User:
 ```bash
 CREATE TABLE IF NOT EXISTS "User" (
   id SERIAL PRIMARY KEY,
   username TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL
 );
-
+```
+For user_fav:
+```bash
 CREATE TABLE IF NOT EXISTS user_fav (
   id SERIAL PRIMARY KEY,
   user_id INTEGER NOT NULL UNIQUE,
@@ -54,8 +58,6 @@ CREATE TABLE IF NOT EXISTS user_fav (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 );
-
-
 ```
 
 ```bash
