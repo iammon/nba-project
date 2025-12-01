@@ -13,7 +13,6 @@ type FavRow = {
 };
 
 export default async function ExplorePage() {
-  // ⬇️ CHANGE IS HERE
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get("nba_session")?.value;
 
@@ -26,177 +25,145 @@ export default async function ExplorePage() {
         userId?: number;
         username?: string;
       };
-      if (typeof parsed.userId === "number") {
-        userId = parsed.userId;
-      }
-      if (typeof parsed.username === "string") {
-        username = parsed.username;
-      }
+      if (typeof parsed.userId === "number") userId = parsed.userId;
+      if (typeof parsed.username === "string") username = parsed.username;
     } catch {
       // bad cookie, ignore
     }
   }
 
+  // If not logged in, just show a simple page
   if (!userId) {
-    // No session: gentle message + link home
     return (
-      <main className="mx-auto max-w-3xl p-6 space-y-4">
-        <h1 className="text-2xl font-bold">NBA Explorer</h1>
+      <main className="mx-auto max-w-3xl p-8 space-y-6">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+          NBA Explorer
+        </h1>
         <p className="text-gray-600">
-          You&apos;re not logged in. Please{" "}
+          You&apos;re not logged in. You can still browse players from the{" "}
+          <Link href="/players" className="text-blue-600 underline">
+            Players page
+          </Link>
+          , or{" "}
           <Link href="/" className="text-blue-600 underline">
-            go back to the home page
-          </Link>{" "}
-          and log in.
+            go back home
+          </Link>
+          .
         </p>
       </main>
     );
   }
 
-  // Look up favorites for this user
+  // Get favorites (READ from user_fav + joined tables)
   const rows = await prisma.$queryRaw<FavRow[]>`
-    SELECT 
+    SELECT
       f.favorite_player_id,
-      p.name AS player_name,
       f.favorite_team_id,
-      COALESCE(
-        CASE 
-          WHEN t.city IS NOT NULL AND t.nickname IS NOT NULL
-          THEN (t.city || ' ' || t.nickname)
-          WHEN t.city IS NOT NULL THEN t.city
-          WHEN t.nickname IS NOT NULL THEN t.nickname
-          ELSE t.abbreviation
-        END,
-        'Unknown team'
-      ) AS team_name
+      p.name AS player_name,
+      (t.city || ' ' || t.nickname) AS team_name
     FROM user_fav f
     LEFT JOIN players p ON p.id = f.favorite_player_id
-    LEFT JOIN teams t ON t.id = f.favorite_team_id
+    LEFT JOIN teams   t ON t.id = f.favorite_team_id
     WHERE f.user_id = ${userId}
     LIMIT 1
   `;
 
   const fav = rows[0] ?? null;
 
-  if (!fav) {
-    // User exists but has no favorites (safety net)
-    return (
-      <main className="mx-auto max-w-3xl p-6 space-y-4">
-        <h1 className="text-2xl font-bold">NBA Explorer</h1>
-        <p className="text-gray-700">
-          Hi{username ? `, ${username}` : ""}! You don&apos;t have favorites set up yet.
-        </p>
-        <Link
-          href="/setup"
-          className="inline-flex mt-4 rounded-xl px-4 py-2 bg-black text-white text-sm font-medium hover:bg-gray-800"
-        >
-          Set up favorites
-        </Link>
-      </main>
-    );
-  }
+  const favoritePlayerLink = fav?.favorite_player_id
+    ? `/players?playerId=${fav.favorite_player_id}`
+    : "/players";
 
-  const { favorite_player_id, favorite_team_id, player_name, team_name } = fav;
+  const favoriteTeamLink = fav?.favorite_team_id
+    ? `/teams?teamId=${fav.favorite_team_id}`
+    : "/teams";
 
   return (
-    <main className="mx-auto max-w-3xl p-6 space-y-6">
+    <main className="mx-auto max-w-3xl p-8 space-y-8">
       <header className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
             NBA Explorer
           </h1>
           <p className="text-sm text-gray-600 mt-1">
-            Hi{username ? `, ${username}` : ""}! Choose where you want to start.
+            Welcome{username ? `, ${username}` : ""}! This page shows what we can
+            do with your data in the database.
           </p>
         </div>
-        <Link href="/" className="text-sm text-blue-600 hover:underline">
+        <Link
+          href="/"
+          className="text-sm text-blue-600 hover:underline"
+        >
           Home
         </Link>
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-2">
-        {/* Favorite player card */}
-        <div className="border rounded-xl p-4 shadow-sm flex flex-col justify-between">
-          <div>
-            <h2 className="text-lg font-semibold mb-1">Favorite Player</h2>
-            {favorite_player_id && player_name ? (
-              <p className="text-sm text-gray-700">{player_name}</p>
-            ) : (
-              <p className="text-sm text-gray-500">
-                You don&apos;t have a favorite player set.
-              </p>
-            )}
-          </div>
-          <div className="mt-4">
-            {favorite_player_id ? (
-              <Link
-                href={`/players?playerId=${favorite_player_id}`}
-                className="inline-flex rounded-xl px-4 py-2 bg-black text-white text-sm font-medium hover:bg-gray-800"
-              >
-                Go to player stats
-              </Link>
-            ) : (
-              <Link
-                href="/setup"
-                className="inline-flex rounded-xl px-4 py-2 bg-gray-200 text-sm font-medium hover:bg-gray-300"
-              >
-                Set favorite player
-              </Link>
-            )}
-          </div>
-        </div>
-
-        {/* Favorite team card */}
-        <div className="border rounded-xl p-4 shadow-sm flex flex-col justify-between">
-          <div>
-            <h2 className="text-lg font-semibold mb-1">Favorite Team</h2>
-            {favorite_team_id && team_name ? (
-              <p className="text-sm text-gray-700">{team_name}</p>
-            ) : (
-              <p className="text-sm text-gray-500">
-                You don&apos;t have a favorite team set.
-              </p>
-            )}
-          </div>
-          <div className="mt-4">
-            {favorite_team_id ? (
-              <Link
-                href={`/teams?teamId=${favorite_team_id}`}
-                className="inline-flex rounded-xl px-4 py-2 bg-black text-white text-sm font-medium hover:bg-gray-800"
-              >
-                Go to team stats
-              </Link>
-            ) : (
-              <Link
-                href="/setup"
-                className="inline-flex rounded-xl px-4 py-2 bg-gray-200 text-sm font-medium hover:bg-gray-300"
-              >
-                Set favorite team
-              </Link>
-            )}
-          </div>
-        </div>
+      {/* Favorites summary (READ from DB) */}
+      <section className="border rounded-xl p-4 space-y-2 bg-white shadow-sm">
+        <h2 className="text-lg font-semibold">Your Favorites</h2>
+        {fav ? (
+          <ul className="text-sm text-gray-700 space-y-1">
+            <li>
+              <span className="font-medium">Favorite player:</span>{" "}
+              {fav.player_name ?? "Not set"}
+            </li>
+            <li>
+              <span className="font-medium">Favorite team:</span>{" "}
+              {fav.team_name ?? "Not set"}
+            </li>
+          </ul>
+        ) : (
+          <p className="text-sm text-gray-600">
+            You haven&apos;t chosen favorites yet.
+          </p>
+        )}
       </section>
 
-      <section className="text-sm text-gray-600">
-        <p>
-          Want to explore more? You can always search for any player or team
-          once you&apos;re on the stats pages.
-        </p>
-        <div className="mt-2 flex gap-3">
+      {/* Navigation: go to player / team pages with pre-loaded favorites */}
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold">Explore Stats</h2>
+        <div className="grid sm:grid-cols-2 gap-3">
           <Link
-            href="/players"
-            className="text-blue-600 hover:underline"
+            href={favoritePlayerLink}
+            className="block rounded-xl border border-gray-200 bg-black text-white text-center px-4 py-3 text-sm font-medium hover:bg-gray-800"
           >
-            Go to Players page
+            View Player Stats
           </Link>
-          <span className="text-gray-400">•</span>
           <Link
-            href="/teams"
-            className="text-blue-600 hover:underline"
+            href={favoriteTeamLink}
+            className="block rounded-xl border border-gray-200 bg-black text-white text-center px-4 py-3 text-sm font-medium hover:bg-gray-800"
           >
-            Go to Teams page
+            View Team Stats
           </Link>
+        </div>
+
+      </section>
+
+      {/* Manage account: UPDATE + DELETE */}
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold">Manage Account</h2>
+        <div className="flex flex-wrap gap-3 items-center">
+          {/* UPDATE favorites: goes to /setup, which writes to user_fav */}
+          <Link
+            href="/setup"
+            className="rounded-xl px-4 py-2 bg-blue-600 text-white text-sm font-medium hover:bg-blue-700"
+          >
+            Update Favorites
+          </Link>
+
+          {/* DELETE account: submits to /api/delete-account */}
+          <form
+            action="/api/delete-account"
+            method="post"
+            className="inline"
+          >
+            <button
+              type="submit"
+              className="rounded-xl px-4 py-2 bg-red-600 text-white text-sm font-medium hover:bg-red-700"
+            >
+              Delete Account
+            </button>
+          </form>
         </div>
       </section>
     </main>
