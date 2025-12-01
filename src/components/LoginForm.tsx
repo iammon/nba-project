@@ -1,13 +1,14 @@
-'use client';
+// src/components/LoginForm.tsx
+"use client";
 
-import { FormEvent, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const router = useRouter();
-  const [mode, setMode] = useState<'login' | 'register'>('login');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [mode, setMode] = useState<"login" | "register">("login");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -17,11 +18,11 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      const endpoint = mode === 'login' ? '/api/login' : '/api/register';
+      const endpoint = mode === "login" ? "/api/login" : "/api/register";
 
       const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
 
@@ -30,35 +31,42 @@ export default function LoginForm() {
       if (!res.ok) {
         setError(
           data.message ||
-            (mode === 'login' ? 'Login failed' : 'Registration failed'),
+            (mode === "login" ? "Login failed" : "Registration failed")
         );
         setLoading(false);
         return;
       }
 
-      // ✅ Decide where to go based on hasFavorites
       const hasFavorites: boolean = !!data.hasFavorites;
+      const favoritePlayerId: number | null =
+        data.favoritePlayerId ?? null;
 
-      if (hasFavorites) {
-        router.push('/players');
+      // 🎯 Redirect logic:
+      if (hasFavorites && favoritePlayerId) {
+        // Go straight to that player's stats page
+        router.push(`/players?playerId=${favoritePlayerId}`);
+      } else if (hasFavorites) {
+        // Has favorites, but no player id (fallback)
+        router.push("/players");
       } else {
-        router.push('/setup');
+        // No favorites yet → go to setup flow
+        router.push("/setup");
       }
     } catch (err) {
       console.error(err);
-      setError('Something went wrong.');
+      setError("Something went wrong.");
       setLoading(false);
     }
   }
 
-  const title = mode === 'login' ? 'Login' : 'Create an Account';
+  const title = mode === "login" ? "Login" : "Create an Account";
   const buttonLabel = loading
-    ? mode === 'login'
-      ? 'Logging in…'
-      : 'Creating account…'
-    : mode === 'login'
-      ? 'Login'
-      : 'Sign up';
+    ? mode === "login"
+      ? "Logging in…"
+      : "Creating account…"
+    : mode === "login"
+    ? "Login"
+    : "Sign up";
 
   return (
     <div className="space-y-3 border rounded-xl p-4 mt-8">
@@ -89,7 +97,7 @@ export default function LoginForm() {
             className="w-full rounded-md border px-3 py-2 text-sm"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+            autoComplete={mode === "login" ? "current-password" : "new-password"}
             required
           />
         </div>
@@ -110,12 +118,12 @@ export default function LoginForm() {
         className="text-xs text-gray-600 underline"
         onClick={() => {
           setError(null);
-          setMode(mode === 'login' ? 'register' : 'login');
+          setMode(mode === "login" ? "register" : "login");
         }}
       >
-        {mode === 'login'
+        {mode === "login"
           ? "Don't have an account? Create one"
-          : 'Already have an account? Log in'}
+          : "Already have an account? Log in"}
       </button>
     </div>
   );
