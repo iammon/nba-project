@@ -22,6 +22,42 @@ cd nba-project
 
 ### 2️⃣ Start Everything with Docker
 
+SQL Commands in case User and user_fav tables don't exist
+```bash
+CREATE TABLE IF NOT EXISTS "User" (
+  id SERIAL PRIMARY KEY,
+  username TEXT NOT NULL UNIQUE,
+  password TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS user_fav (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL UNIQUE,
+  favorite_player_id INTEGER NOT NULL,
+  favorite_team_id INTEGER NOT NULL,
+
+  CONSTRAINT user_fav_user_fk
+    FOREIGN KEY (user_id)
+    REFERENCES "User"(id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+
+  CONSTRAINT user_fav_player_fk
+    FOREIGN KEY (favorite_player_id)
+    REFERENCES players(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+
+  CONSTRAINT user_fav_team_fk
+    FOREIGN KEY (favorite_team_id)
+    REFERENCES teams(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+);
+
+
+```
+
 ```bash
 docker compose up -d --build
 ```
