@@ -38,19 +38,17 @@ export default function LoginForm() {
       }
 
       const hasFavorites: boolean = !!data.hasFavorites;
-      const favoritePlayerId: number | null =
-        data.favoritePlayerId ?? null;
+      // we *can* read these, but the explore page will also look them up
+      // const favoritePlayerId: number | null = data.favoritePlayerId ?? null;
+      // const favoriteTeamId: number | null = data.favoriteTeamId ?? null;
 
-      // 🎯 Redirect logic:
-      if (hasFavorites && favoritePlayerId) {
-        // Go straight to that player's stats page
-        router.push(`/players?playerId=${favoritePlayerId}`);
-      } else if (hasFavorites) {
-        // Has favorites, but no player id (fallback)
-        router.push("/players");
-      } else {
+      // 🎯 New redirect logic:
+      if (!hasFavorites) {
         // No favorites yet → go to setup flow
         router.push("/setup");
+      } else {
+        // Has favorites → go to the choice page
+        router.push("/explore");
       }
     } catch (err) {
       console.error(err);
