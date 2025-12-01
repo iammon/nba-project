@@ -13,6 +13,9 @@ Built to demonstrate database querying and API interaction between a modern web 
 
 ## 🚀 Quick Start
 
+Link to powerpoint:
+https://www.canva.com/design/DAG2MFInV_4/yTupmlGUVBVdm-AYjzQyQw/edit?utm_content=DAG2MFInV_4&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+
 ### 1️⃣ Clone the Repository
 This step is unneeded if running on GitHub Codespaces.
 ```bash
