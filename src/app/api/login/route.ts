@@ -1,61 +1,80 @@
 // src/app/api/login/route.ts
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
-  const { username, password } = await req.json();
-
-  if (!username || !password) {
-    return NextResponse.json(
-      { success: false, message: "Missing username or password." },
-      { status: 400 }
-    );
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { username },
-  });
-
-  // plain-text password check (since you said security doesn't matter here)
-  if (!user || user.password !== password) {
-    return NextResponse.json(
-      { success: false, message: "Invalid username or password." },
-      { status: 401 }
-    );
-  }
-
-  // 🔍 Look for this user's favorites in user_fav
-  const favRows = await prisma.$queryRaw<
-    { user_id: number; favorite_player_id: number | null; favorite_team_id: number | null }[]
-  >`
-    SELECT user_id, favorite_player_id, favorite_team_id
-    FROM user_fav
-    WHERE user_id = ${user.id}
-    ORDER BY user_id ASC
-    LIMIT 1
-  `;
-
-  const fav = favRows[0] ?? null;
-  const hasFavorites = !!fav;
-  const favoritePlayerId = fav?.favorite_player_id ?? null;
-  const favoriteTeamId = fav?.favorite_team_id ?? null;
-
-  const res = NextResponse.json({
-    success: true,
-    hasFavorites,
-    favoritePlayerId,
-    favoriteTeamId,
-  });
-
-  // super basic "session" cookie
-  res.cookies.set(
-    "nba_session",
-    JSON.stringify({ userId: user.id, username: user.username }),
-    {
-      httpOnly: false, // in real life: true + secure
-      path: "/",
+  try {
+    const body = await req.json().catch(() => null);
+    if (!body) {
+      return NextResponse.json(
+        { message: "Invalid JSON body" },
+        { status: 400 }
+      );
     }
-  );
 
-  return res;
+    const { username, password } = body as {
+      username?: string;
+      password?: string;
+    };
+
+    if (!username || !password) {
+      return NextResponse.json(
+        { message: "Username and password are required" },
+        { status: 400 }
+      );
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { username },
+    });
+
+    if (!user || user.password !== password) {
+      // (You said you don't care about security, so plain compare is fine)
+      return NextResponse.json(
+        { message: "Invalid username or password" },
+        { status: 401 }
+      );
+    }
+
+    // Check favorites
+    const favRow = await prisma.$queryRaw<
+      { favorite_team_id: number | null; favorite_player_id: number | null }[]
+    >`
+      SELECT favorite_team_id, favorite_player_id
+      FROM user_fav
+      WHERE user_id = ${user.id}
+      LIMIT 1
+    `;
+
+    const favorites = favRow[0] ?? null;
+    const hasFavorites = !!favorites;
+    const favoritePlayerId = favorites?.favorite_player_id ?? null;
+
+    // Set a simple cookie
+    const cookieStore = await cookies();
+    cookieStore.set(
+      "nba_session",
+      JSON.stringify({ userId: user.id, username: user.username }),
+      {
+        httpOnly: false, // fine for your simple app
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+      }
+    );
+
+    return NextResponse.json({
+      ok: true,
+      userId: user.id,
+      username: user.username,
+      hasFavorites,
+      favoritePlayerId,
+    });
+  } catch (err) {
+    console.error("Error in /api/login", err);
+    return NextResponse.json(
+      { message: "Server error" },
+      { status: 500 }
+    );
+  }
 }
